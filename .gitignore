@@ -1,0 +1,7 @@
+*.ipynb_checkpoints
+*.pyc
+*.obj
+*.pt
+*.yml
+
+STAR/model/*
