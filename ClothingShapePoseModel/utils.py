@@ -11,7 +11,7 @@ def log(message, silent = False):
     if not silent:
         print('>>>', message)
 
-def load_obj(file_path, silent = False, verts_only = False):
+def load_obj(file_path, silent = False, verts_only = False, to_numpy = False):
     '''
     *** INPUT ***
         file_path: obj file path
@@ -87,23 +87,24 @@ def load_obj(file_path, silent = False, verts_only = False):
                             face_split_token += character
                         else:
                             break
-                if len(words) != 4: error('load_obj only can process mesh with 3 faces. But, input mesh has %d faces'%len(words))
-                fVerts.append([int(words[1].split(face_split_token)[0]) - 1,
-                                int(words[2].split(face_split_token)[0]) - 1,
-                                int(words[3].split(face_split_token)[0]) - 1])
+                #if len(words) != 4: error('load_obj only can process mesh with 3 faces. But, input mesh has %d faces'%len(words))
+                len_face = len(words) # number of vertices of the face + 1
+                fVerts.append([int(words[i].split(face_split_token)[0]) - 1 for i in range(1, len_face)])
                 if has_texture_coords:
-                    fTexture_coords.append([int(words[1].split(face_split_token)[1]) - 1,
-                                    int(words[2].split(face_split_token)[1]) - 1,
-                                    int(words[3].split(face_split_token)[1]) - 1])
+                    fTexture_coords.append([int(words[i].split(face_split_token)[1]) - 1 for i in range(1, len_face)])
                 if has_texture_coords and has_normals:
-                    fNormals.append([int(words[1].split(face_split_token)[2]) - 1,
-                                    int(words[2].split(face_split_token)[2]) - 1,
-                                    int(words[3].split(face_split_token)[2]) - 1])
+                    fNormals.append([int(words[i].split(face_split_token)[2]) - 1 for i in range(1, len_face)])
                 if has_normals:
-                    fNormals.append([int(words[1].split(face_split_token)[1]) - 1,
-                                    int(words[2].split(face_split_token)[1]) - 1,
-                                    int(words[3].split(face_split_token)[1]) - 1])
+                    fNormals.append([int(words[i].split(face_split_token)[1]) - 1 for i in range(1, len_face)])
     obj_dict = {}
+    if to_numpy:
+        verts = np.asarray(verts)
+        colors = np.asarray(colors)
+        texture_coords = np.asarray(texture_coords)
+        normals = np.asarray(normals)
+        fVerts = np.asarray(fVerts)
+        fTexture_coords = np.asarray(fTexture_coords)
+        fNormalsfNormals = np.asarray(fNormals)
     obj_dict['verts'] = verts
     obj_dict['colors'] = colors
     obj_dict['texture_coords'] = texture_coords
@@ -159,30 +160,35 @@ def save_obj(obj_dict, file_path, fToken = '/'):
             fp.write( 'vn %f %f %f\n' % ( n[0], n[1], n[2]) )
         if has_texture_coords and has_normals:
             for i in range(len(fVerts)): # Faces are 1-based, not 0-based in obj files
-                fp.write( 'f %d%s%d%s%d %d%s%d%s%d %d%s%d%s%d\n' %
-                            (fVerts[i][0] + 1, fToken, fTexture_coords[i][0] + 1, fToken, fNormals[i][0] + 1,
-                            fVerts[i][1] + 1, fToken, fTexture_coords[i][1] + 1, fToken, fNormals[i][1] + 1,
-                            fVerts[i][2] + 1, fToken, fTexture_coords[i][2] + 1, fToken, fNormals[i][2] + 1) )
+                len_face = len(fVerts[i]) # number of vertices in the face
+                fp.write('f')
+                for t in range(len_face):
+                    fp.write( ' %d%s%d%s%d' % (fVerts[i][t] + 1, fToken, fTexture_coords[i][t] + 1, fToken, fNormals[i][t] + 1) )
+                fp.write('\n')
         elif has_texture_coords:
             for i in range(len(fVerts)): # Faces are 1-based, not 0-based in obj files
-                fp.write( 'f %d%s%d %d%s%d %d%s%d\n' %
-                            (fVerts[i][0] + 1, fToken, fTexture_coords[i][0] + 1,
-                            fVerts[i][1] + 1, fToken, fTexture_coords[i][1] + 1,
-                            fVerts[i][2] + 1, fToken, fTexture_coords[i][2] + 1) )
+                len_face = len(fVerts[i]) # number of vertices in the face
+                fp.write('f')
+                for t in range(len_face):
+                    fp.write( ' %d%s%d' % (fVerts[i][t] + 1, fToken, fTexture_coords[i][t] + 1) )
+                fp.write('\n')
         elif has_normals:
             for i in range(len(fVerts)): # Faces are 1-based, not 0-based in obj files
-                fp.write( 'f %d%s%d %d%s%d %d%s%d\n' %
-                            (fVerts[i][0] + 1, fToken, fNormals[i][0] + 1,
-                            fVerts[i][1] + 1, fToken, fNormals[i][1] + 1,
-                            fVerts[i][2] + 1, fToken, fNormals[i][2] + 1) )
+                len_face = len(fVerts[i]) # number of vertices in the face
+                fp.write('f')
+                for t in range(len_face):
+                    fp.write( ' %d%s%d' % (fVerts[i][t] + 1, fToken, fNormals[i][t] + 1) )
+                fp.write('\n')
         else:
             for i in range(len(fVerts)): # Faces are 1-based, not 0-based in obj files
-                fp.write( 'f %d %d %d\n' %
-                            (fVerts[i][0] + 1,
-                            fVerts[i][1] + 1,
-                            fVerts[i][2] + 1) )
+                len_face = len(fVerts[i]) # number of vertices in the face
+                fp.write('f')
+                for t in range(len_face):
+                    fp.write( ' %d' % (fVerts[i][t] + 1) )
+                fp.write('\n')
     log('OBJ file [%s] save completed.'%file_path)
     return None
+
 
 class STAR:
     def __init__(self):
@@ -192,6 +198,19 @@ class STAR:
         star = STAR_(gender = 'male')
         log('Star loaded completely.')
         return star
+    
+    def disp_generator(self, pose, shape):
+        N = pose.shape[0]
+        trans = np.zeros((N, 3))
+        base_vertices = STAR.star_forward(self.star, pose, shape, trans)
+        new_shape = shape + np.random.normal(0.0, 1.0, 10)
+
+        new_vertices = STAR.star_forward(self.star, pose, new_shape, trans)
+        disp = np.subtract(new_vertices, base_vertices)
+
+        return new_shape, disp
+
+    @staticmethod
     def star_forward(star, pose, shape, trans, disps = None, to_numpy = True):
         '''
         *** INPUT ***
@@ -214,7 +233,9 @@ class STAR:
                 disps = torch.FloatTensor(disps)
             disps = disps.to('cuda')
 
-        vertices = star(pose.to('cuda'), shape.to('cuda'), trans.to('cuda'), disps).to('cpu')
+        # vertices = star(pose.to('cuda'), shape.to('cuda'), trans.to('cuda'), disps).to('cpu')
+        # kyoosik 0530
+        vertices = star(pose.to('cuda'), torch.zeros([1, 10]).to('cuda'), torch.zeros([1, 3]).to('cuda'), torch.zeros([1, 6890, 3]).to('cuda')).to('cpu')
         if to_numpy:
             vertices = vertices.numpy()
         return vertices

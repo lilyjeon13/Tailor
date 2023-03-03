@@ -3,9 +3,11 @@ import os
 import json
 from sklearn.decomposition import PCA
 import time
-from utils import load_obj, save_obj, log
+from utils import load_obj, save_obj, log, STAR
 from mlp import MLP, train, get_optimizer
+import torch.optim as optim
 import torch
+import array
 
 ''' pose shape -> cloth vertices '''
 class ClothingShapePoseModelMLP:
@@ -25,6 +27,7 @@ class ClothingShapePoseModelMLP:
         self.dims = dims
         self.save_path = save_path
         self.lr = lr
+        self.star = STAR()
         if train:
             self.get_params_list()
             self.MLP_training()
@@ -50,29 +53,48 @@ class ClothingShapePoseModelMLP:
             self.pose_list = self.pose_list[:N_pose]
         log('Length of pose: %d'%len(self.pose_list))
         self.base_body_list = []
-        for pose in self.pose_list:
+        for i, pose in enumerate(self.pose_list):
             base_body_list = os.listdir(os.path.join(self.base_body_dir, pose))
-            base_body_list = [os.path.join(self.base_body_dir, pose, dir_) for dir_ in base_body_list if dir_.endswith('_params.json')]
+
+            # if (i == 0):
+            #     print(pose) 
+            #     print(base_body_list)
+            #     print( [os.path.join(self.base_body_dir, pose, dir_) for dir_ in base_body_list if dir_.endswith('_params.json')])
+            #     print( [os.path.join(self.base_body_dir, pose, dir_.replace("_params.json", "")) for dir_ in base_body_list if dir_.endswith('_params.json')])
+            
+            base_body_list = [os.path.join(self.base_body_dir, pose, dir_) for dir_ in base_body_list if dir_.endswith('t_0000_params.json')]
             if N_shape != -1:
                 base_body_list = base_body_list[:N_shape]
             self.base_body_list += base_body_list
         log('Length of shape: %d'%(len(self.base_body_list) // len(self.pose_list)))
         log('Length of data: %d'%len(self.base_body_list))
 
-        self.params = {'shape':[], 'pose':[], 'trans':[], 'body_vs':[], 'cloth_vs':[]}
+        self.params = {'shape':[], 'pose':[], 'trans':[], 'body_vs':[], 'cloth_vs':[], 'disp':[]} # added displacement
         self.textures = None
         self.faces_vs = None
         self.faces_textures = None
+        print("self.base_body_list is ")
+        print(self.base_body_list)
         for i, base_body in enumerate(self.base_body_list):
             with open(base_body, "r") as json_:
                 param = json.load(json_)
-                self.params['shape'].append(param['shape'])
+                # self.params['shape'].append(param['shape'])
                 self.params['pose'].append(param['pose'])
                 self.params['trans'].append(param['trans'])
             self.params['body_vs'].append(load_obj(base_body.replace('_params.json', '.obj'), silent = True, verts_only = True)['verts'])
             self.params['cloth_vs'].append(load_obj(os.path.join(base_body.replace('_params.json', ''), self.cloth_name,
                                                                  base_body.replace('_params.json', '').split('/')[-1] + '_%s-scale10.obj'%self.cloth_name), silent = True, verts_only = True)['verts'])
+            
+            # print(param['shape'])
+            # print(type(param['shape']))
+                                                                 
+            shape, disp = self.star.disp_generator(np.array([param['pose']]), np.array([param['shape']]))
+            # print(type(shape))
+            # Kyoosik 0531 
+            # self.params['shape'].append(shape)
+            # self.params['disp'].append(disp)
             if i == 0:
+                print(os.path.join(base_body.replace('_params.json', ''), self.cloth_name, base_body.replace('_params.json', '').split('/')[-1] + '_%s-scale10.obj'%self.cloth_name))
                 obj_dict = load_obj(os.path.join(base_body.replace('_params.json', ''), self.cloth_name, base_body.replace('_params.json', '').split('/')[-1] + '_%s-scale10.obj'%self.cloth_name), silent = True)
                 self.fVerts = obj_dict['fVerts'] # faces of vertex
                 self.texture_coords = obj_dict['texture_coords']
@@ -84,9 +106,12 @@ class ClothingShapePoseModelMLP:
             self.params[key] = np.asarray(self.params[key])
 
     def load_training_data(self):
-        x_shape = torch.FloatTensor(self.params['shape'].reshape([len(self.params['shape']), -1])) # [N, 10]
+        # kyoosik 0531
+        # x_shape = torch.FloatTensor(self.params['shape'].reshape([len(self.params['shape']), -1])) # [N, 10]
         x_pose = torch.FloatTensor(self.params['pose'].reshape([len(self.params['pose']), -1])) # [N, 72]
-        x = torch.cat((x_shape, x_pose), dim = 1) # [N, 10 + 72]
+        # x_disp = torch.FloatTensor(self.params['disp'].reshape([len(self.params['disp']), -1])) # [N, 20670]
+        # x = torch.cat((x_shape, x_pose, x_disp), dim = 1) # [N, 10 + 72 + 20670] # x_shape, x_pose, x_disp 로 바꾸기
+        x = x_pose # [N, 10 + 72 + 20670] # x_shape, x_pose, x_disp 로 바꾸기
         y = torch.FloatTensor(self.params['cloth_vs'].reshape([len(self.params['cloth_vs']), -1])) # [N, N_V]
         return x,y
 
@@ -97,6 +122,23 @@ class ClothingShapePoseModelMLP:
         self.mlp = MLP(dims = dims)
         self.mlp.load_state_dict(torch.load(self.save_path))
         self.mlp.eval()
+        idx = 0
+        for param in self.mlp.parameters():
+            numbers = []
+            if (len(param.shape)==1): # bias
+                for i in range(param.shape[0]):
+                    numbers.append(param[i].item())
+
+            else: # weights
+                for i in range(param.shape[0]):
+                    for j in range(param.shape[1]):
+                        numbers.append(param[i][j].item())
+            filename = "layer"+str(idx)
+            with open(filename, 'wb') as fp:
+                array.array('d', numbers).tofile(fp)
+            idx+=1
+            
+            
 
     def MLP_training(self):
         x,y = self.load_training_data()
@@ -106,7 +148,7 @@ class ClothingShapePoseModelMLP:
         optimizer = get_optimizer(self.mlp, lr = self.lr)
         train(self.mlp, optimizer, x, y, self.epochs)
 
-    def drape(self, pose, shape, name = 'sample', save_dir = './example'):
+    def drape(self, pose, shape, disp, name = 'sample', save_dir = './example'):
         '''
             pose: [72] (numpy)
             shape: [10] (numpy)
@@ -115,7 +157,9 @@ class ClothingShapePoseModelMLP:
         start_time = time.time()
         x_shape = torch.FloatTensor(shape.reshape([1, -1]))
         x_pose = torch.FloatTensor(pose.reshape([1, -1]))
-        x = torch.cat((x_shape, x_pose), dim = 1)
+        x_disp = torch.FloatTensor(disp.reshape([1, -1]))
+        x = torch.cat((x_shape, x_pose, x_disp), dim=1)
+        #x = torch.zeros(20752)
         self.cloth = self.mlp(x)
         self.cloth = self.cloth.detach().numpy().reshape([-1,3])
         end_time = time.time()
