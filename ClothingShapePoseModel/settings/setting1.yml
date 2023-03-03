@@ -1,0 +1,8 @@
+epochs: 200000
+# dims: [2048, 2048, 2048, 2048, 2048]
+# dims: [512, 1024, 1024, 1024]
+dims: [2048, 2048, 2048, 2048, 2048]
+# dims: [1024, 512, 512, 1024]
+train: True # Train or load
+cloth_name: clothWhite2
+base_body_dir: ../../Data/base_body
