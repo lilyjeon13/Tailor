@@ -1,5 +1,10 @@
 # 2022-1 소프트웨어종합설계 Tailor 팀
 
+- Presentation 
+  - video: [link](https://youtu.be/6ecoxuVkcSE)
+  - pdf: [link](https://github.com/lylajeon/SojongTailor/blob/main/presentation.pdf)
+  - code for mobile app: [link](https://github.com/KyooSikLee/Tailor)
+
 - ./STAR
   - STAR 와 관련된 코드입니다.
   - ./STAR/model/star_1_1/male/model.npz 를 https://drive.google.com/file/d/1N66BUShOyoHhFGZwCaHJawuvI7t4K39z/view?usp=sharing 에서 다운받으세요.

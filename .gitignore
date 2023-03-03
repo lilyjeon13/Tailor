@@ -3,6 +3,7 @@
 # *.obj
 # *.pt
 # *.yml
+**/.DS_Store
 
 STAR/model/*
 # ClothingShapePoseModel/model/*.pt
