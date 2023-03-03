@@ -1,9 +1,9 @@
 # 2022-1 소프트웨어종합설계 Tailor 팀
 
 - Presentation 
-  - video: [link](https://youtu.be/6ecoxuVkcSE)
-  - pdf: [link](https://github.com/lylajeon/Tailor/blob/main/presentation.pdf)
-  - code for mobile app: [link](https://github.com/KyooSikLee/Tailor)
+  - video: [Youtube link](https://youtu.be/6ecoxuVkcSE)
+  - pdf: [Tailor/presentation.pdf](https://github.com/lylajeon/Tailor/blob/main/presentation.pdf)
+  - code for mobile app: [KyooSikLee/Tailor](https://github.com/KyooSikLee/Tailor)
 
 - ./STAR
   - STAR 와 관련된 코드입니다.
