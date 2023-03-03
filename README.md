@@ -2,7 +2,7 @@
 
 - Presentation 
   - video: [link](https://youtu.be/6ecoxuVkcSE)
-  - pdf: [link](https://github.com/lylajeon/SojongTailor/blob/main/presentation.pdf)
+  - pdf: [link](https://github.com/lylajeon/Tailor/blob/main/presentation.pdf)
   - code for mobile app: [link](https://github.com/KyooSikLee/Tailor)
 
 - ./STAR
