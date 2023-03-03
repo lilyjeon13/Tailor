@@ -4,6 +4,7 @@
   - video: [Youtube link](https://youtu.be/6ecoxuVkcSE)
   - pdf: [Tailor/presentation.pdf](https://github.com/lylajeon/Tailor/blob/main/presentation.pdf)
   - code for mobile app: [KyooSikLee/Tailor](https://github.com/KyooSikLee/Tailor)
+  - final report: [report link](https://github.com/lylajeon/Tailor/blob/main/Tailor_FinalReport.pdf)
 
 - ./STAR
   - STAR 와 관련된 코드입니다.
