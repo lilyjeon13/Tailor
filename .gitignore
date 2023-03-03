@@ -5,3 +5,4 @@
 *.yml
 
 STAR/model/*
+ClothingShapePoseModel/model/*
