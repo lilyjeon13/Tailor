@@ -1,5 +1,15 @@
 # 2022-1 소프트웨어종합설계 Tailor 팀
 
+- Team Tailor 
+  
+  |                 전영주                  |                   이규식                    |                  김성하                   |
+  | :-------------------------------------: | :-----------------------------------------: | :---------------------------------------: |
+  | [lylajeon](https://github.com/lylajeon) | [KyooSikLee](https://github.com/KyooSikLee) | [irumi1206](https://github.com/irumi1206) |
+  
+  지도교수님: 이인권 교수님 
+  
+  조교님: [이도해](https://github.com/dlehgo14) 조교님, 전상빈 조교님
+  
 - Presentation 
   - video: [Youtube link](https://youtu.be/6ecoxuVkcSE)
   - pdf: [Tailor/presentation.pdf](https://github.com/lylajeon/Tailor/blob/main/presentation.pdf)

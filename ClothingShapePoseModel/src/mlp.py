@@ -63,7 +63,7 @@ def HUBER_LOSS(y, y_pred, delta = 1.0):
     return output
 
 def get_optimizer(model, lr=1e-3):
-    # # Depricated
+    # # Deprecated
     # return optim.Adam( sum([list(model.parameters()) for model in models]), lr=lr)
     return AdamP( sum([list(model.parameters()) for model in models]), lr=lr)
 
