@@ -13,8 +13,6 @@
 
 - ./ClothingShapePoseModel
   - shape, pose -> cloth vertices
-  - clothing_shape_model.py
-    - AgentDress 의 clothing shape model 을 구현해본 코드입니다. 사용하지는 않을 거 같지만 일단 남겨뒀습니다.
   - clothing_shape_pose_model.py
     - main 코드 입니다.
   - mlp.py

@@ -1,8 +1,29 @@
-epochs: 200000
-# dims: [2048, 2048, 2048, 2048, 2048]
-# dims: [512, 1024, 1024, 1024]
-dims: [2048, 2048, 2048, 2048, 2048]
-# dims: [1024, 512, 512, 1024]
-train: True # Train or load
-cloth_name: clothWhite2
-base_body_dir: ../../Data/base_body
+epochs0: 0 #1000
+epochs1: 0 #100000
+epochs2: 1000 #500 #100000
+dims: [4096, 4096, 4096, 4096, 4096]
+#enc_dims: [31425, 8192, 2048, 2048]
+enc_dims: [31425, 2048, 2048, 2048]
+train: False # Train or load
+#cloth_name: clothShirts3
+#cloth_name: clothContinental2
+#cloth_name: pantsYellow1
+#cloth_name: clothContinental5
+cloth_name: clothShirts3
+#base_body_dir: ../../Metown-body/base_body
+#base_body_dir: ../../../Metown-body/base_body_smplx
+#base_body_dir: ../../../Metown-body/base_body_smplx3
+base_body_dir: ../../../Metown-body/base_body_smplx4
+#valid_list_path: ../../Metown-body/base_body/clothShirts3_valid_list.json
+#valid_list_path: ../../../Metown-body/base_body_smplx/clothShirts3_valid_list.json
+#valid_list_path: ../../../Metown-body/base_body_smplx3/clothContinental2_valid_list.json
+#valid_list_path: ../../../Metown-body/base_body_smplx3/pantsYellow1_valid_list.json
+valid_list_path: ../../../Metown-body/base_body_smplx4/clothContinental5_valid_list.json
+
+model_name: model5
+# model6: clothShirts3, base_body_smplx4
+# model5: clothContinental5, base_body_smplx4
+# model4: pantsYellow1, base_body_smplx3
+# model3: clothContinental2, base_body_smplx3
+# model2: clothContinental2
+# model3: pantsYellow1
