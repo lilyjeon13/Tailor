@@ -8,7 +8,6 @@ import time
 #yj
 from adamp import AdamP
 from torch.cuda.amp import autocast
-import numpy as np
 
 
 class MLP(nn.Module):
@@ -53,7 +52,7 @@ def MSE(Y, Pred, batch_size):
 def MAE(Y, Pred, batch_size):
     return (torch.abs(Y - Pred)).sum() / batch_size
 
-def HUBER_LOSS(y, y_pred, batch_size, delta = 1.0):
+def HUBER_LOSS(y, y_pred, delta = 1.0):
     huber_mse = 0.5*((y-y_pred)**2).sum()
     huber_mae = delta * (torch.abs(y - y_pred).sum() - 0.5 * delta)
     output = 0
@@ -79,7 +78,6 @@ def get_loss(Y, Pred, cur_epoch, epochs, device = 'cuda', log = False):
 
     if log:
         print('\rtraining... %04d/%04d: loss: %03.3f'%(cur_epoch, epochs, loss), end='')
-
 
     return loss
 
